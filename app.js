@@ -3,6 +3,7 @@ const bodyParser = require("body-parser")
 const date = require(__dirname+"/date.js")
 const app = express();
 const mongoose = require("mongoose")
+const _ = require("lodash");
 app.use(bodyParser.urlencoded({extended:true}))
 app.set("view engine","ejs");
 app.use(express.static("public"))
@@ -59,7 +60,7 @@ app.get("/",function(req,res){
 })
 
 app.get("/:customList",function(req,res){
-    const customListName = req.params.customList
+    const customListName = _.capitalize(req.params.customList);
 
     List.findOne({name: customListName}, function(err, foundList){
         if(!err){
@@ -85,23 +86,47 @@ app.get("/:customList",function(req,res){
 app.post("/delete",function(req,res){
     
     const deletedItem = req.body.deleter;
-    Item.findByIdAndRemove(deletedItem,function(err){
-        if(err){console.log(err)}
-        res.redirect("/")
-    })
+    const listName = req.body.listName;
+
+    // Item.findByIdAndRemove(deletedItem,function(err){
+    //     if(err){console.log(err)}
+    //     res.redirect("/")
+    // })
+    if(listName === "Today"){
+        Item.findByIdAndRemove(deletedItem,function(err){
+            res.redirect("/");})
+    } else{
+        List.findOneAndUpdate({name: listName},{$pull:{items:{_id:deletedItem}}},function(err, foundList){
+            if(!err){
+                res.redirect("/"+listName)
+            }
+        })
+        }
+
+
 })
 
 app.post("/",function(req,res){
     
     const itemName = req.body.newItem
+    const listName = req.body.list
 
     const item = new Item({
         name: itemName
     })
 
-    item.save();
+    if(listName === "Today"){
+        item.save();
+        res.redirect("/");
+    } else{
+        List.findOne({name: listName}, function(err,foundList){
+            foundList.items.push(item)
+            foundList.save();
+            res.redirect("/"+listName)
+        })
+    }
+
     
-    res.redirect("/")
 })
 
 
