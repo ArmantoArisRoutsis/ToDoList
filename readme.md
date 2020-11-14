@@ -21,7 +21,7 @@
 * ###### MONGODB
 
 ## Technical Information
-#### To run the site on your local machine
+### To run the site on your local machine
 
 Download or clone the repository onto your machine.
 Extract the .zip file.

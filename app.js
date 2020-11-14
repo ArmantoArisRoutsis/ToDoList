@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.set("view engine","ejs");
 app.use(express.static("public"))
 
-mongoose.connect("mongodb://localhost:27017/todolistdb", {useNewUrlParser: true });
+mongoose.connect("mongodb+srv://admin-armanto:6942096892@cluster0.getau.mongodb.net/todolistdb", {useNewUrlParser: true });
 
 const itemsSchema = {
     name: String
@@ -22,20 +22,6 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 const Item =  mongoose.model("Item", itemsSchema);
-
-const item1 = new Item({
-    name: "Go to Work"
-})
-
-const item2 = new Item({
-    name: "Come back Home"
-})
-
-const item3 = new Item({
-    name: "Eat"
-})
-
-const defaultArray = [item1,item2,item3]
 
 
 
@@ -121,7 +107,25 @@ app.post("/",function(req,res){
     
 })
 
+app.post("/newList",function(req,res){
+    const buttonListName = _.capitalize(req.body.newList);
+    const listName = req.body.list
 
-app.listen(3000, function(){
+    const buttonList = new List({
+        name: buttonListName
+    })
+    buttonList.save();
+    res.redirect("/"+listName)
+
+    // if(listName === "Today"){
+    //     item.save();
+    //     res.redirect("/");
+    // } else{
+    //     res.redirect("/"+listName)
+    
+})
+
+
+app.listen(process.env.PORT || 3000, function(){
     console.log("Server Started on Port 3000");
-});
+}); 
