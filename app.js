@@ -42,17 +42,10 @@ const defaultArray = [item1,item2,item3]
 app.get("/",function(req,res){
     
     Item.find({},function(err,foundItems){
-        if(foundItems.length ===0){
-            Item.insertMany(defaultArray,function(err){
-                if(err){
-                    console.log(err);
-                }else{
-                    console.log("Everything went well in the DB side! :)")
-                }
-            })
-            res.redirect("/")
-        }else{
-            res.render('list', {listTitle: "Today", allItems:foundItems});
+        if(!err){
+            List.find({},(function(err,allLists){
+                res.render("list",{listTitle: "Today", allItems:foundItems, allLists: allLists})
+            }))
         }
     })
 
@@ -63,22 +56,21 @@ app.get("/:customList",function(req,res){
     const customListName = _.capitalize(req.params.customList);
 
     List.findOne({name: customListName}, function(err, foundList){
-        if(!err){
             if(!foundList){
                 //Create a new List
                 const list = new List({
-                    name: customListName,
-                    items: defaultArray
+                name: customListName
                 })
-            
                 list.save();
                 res.redirect("/"+customListName)
             } else {
                 //Show an existing List
-                res.render("list",{listTitle: foundList.name ,allItems:foundList.items})
+                List.find({},(function(err,allLists){
+                    res.render("list",{listTitle: foundList.name ,allItems:foundList.items, allLists: allLists})
+                }))
+                
             }
 
-        }
     })
     
 })

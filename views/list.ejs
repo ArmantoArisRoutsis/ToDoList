@@ -18,6 +18,15 @@
             <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
             <button class="add-button" type="submit" name="list" value ="<%= listTitle %>">+</button>
         </form>
+
+    </div>
+    <div class="box">
+        <p class="item">Default list</p>
+        <% allLists.forEach(function(eachList){ %>
+            <div class="item">
+                <p><%= eachList.name %></p>
+            </div>
+        <% }) %>
     </div>
 
 <%- include("footer") -%>
